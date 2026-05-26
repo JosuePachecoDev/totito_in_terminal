@@ -1,86 +1,85 @@
 from random import randrange
-import time
+from time import sleep
 
-def displayBoard(board):
+userMark = 'O'
+pcMark = 'X'
+icon = ' '
+grid = [[],[],[]]
+run = True
+
+def displayBoard():
+    global grid
+
     print('+-------+-------+-------+')
     print('|       |       |       |')
-    print(f'|   {board[0][0]}   |   {board[0][1]}   |   {board[0][2]}   |')
+    print(f'|   {grid[0][0]}   |   {grid[0][1]}   |   {grid[0][2]}   |')
     print('|       |       |       |')
     print('+-------+-------+-------+')
     print('|       |       |       |')
-    print(f'|   {board[1][0]}   |   {board[1][1]}   |   {board[1][2]}   |')
+    print(f'|   {grid[1][0]}   |   {grid[1][1]}   |   {grid[1][2]}   |')
     print('|       |       |       |')
     print('+-------+-------+-------+')
     print('|       |       |       |')
-    print(f'|   {board[2][0]}   |   {board[2][1]}   |   {board[2][2]}   |')
+    print(f'|   {grid[2][0]}   |   {grid[2][1]}   |   {grid[2][2]}   |')
     print('|       |       |       |')
     print('+-------+-------+-------+')
 
-def userTurn(board):
-    userMove = int(input('-- Ingresa es tu siguiente jugada: '))
-    if userMove > 0 and userMove <= 9:
-        if isTaken(userMove, board):
-            print(userMove, 'ya está marcado, prueba otra vez ↡')
-            userTurn(board)
+def userTurn():
+    global grid, run
+    while True:
+        userMove = int(input('\n-- Ingresa es tu próxima jugada: '))
+        if userMove > 0 and userMove <= 9:
+            if isTaken(userMove):
+                print(f'La casilla {userMove} ya está marcada, prueba otra vez ↡')
+                continue
+            else:
+                userMove -= 1
+                grid[userMove//3][userMove%3] = userMark
+                break
         else:
-            userMove -= 1
-            row = userMove // 3
-            col = userMove % 3
-            board[row][col] = userMark
-    else:
-        print(userMove, 'está fuera de rango, prueba otra vez ↡')
-        userTurn(board)
+            print(userMove, 'está fuera de rango, prueba otra vez ↡')
+            continue
 
-def pcTurn(board):
+def pcTurn():
+    global grid, run
     while True:
         pcMove = randrange(0, 9)
-        row = pcMove // 3
-        col = pcMove % 3
-        if isTaken(pcMove+1, board):
+        if isTaken(pcMove+1):
             continue
         else:
-            board[row][col] = pcMark
+            grid[pcMove//3][pcMove%3] = pcMark
             break
 
-def isWinner(board, sign):
-    if (board[0][0] == sign and board[0][1] == sign and board[0][2] == sign) or (board[1][0] == sign and board[1][1] == sign and board[1][2] == sign) or (board[2][0] == sign and board[2][1] == sign and board[2][2] == sign) or (board[0][0] == sign and board[1][0] == sign and board[2][0] == sign) or (board[0][1] == sign and board[1][1] == sign and board[2][1] == sign) or (board[0][2] == sign and board[1][2] == sign and board[2][2] == sign) or (board[0][2] == sign and board[1][1] == sign and board[2][0]) or (board[0][0] == sign and board[1][1] == sign and board[2][2] == sign):
-        return True
+def isWinner(sign):
+    global grid
+    if grid[0][0] == sign and grid[0][1] == sign and grid[0][2] == sign: return True
+    elif grid[1][0] == sign and grid[1][1] == sign and grid[1][2] == sign: return True
+    elif grid[2][0] == sign and grid[2][1] == sign and grid[2][2] == sign: return True
+    elif grid[0][0] == sign and grid[1][0] == sign and grid[2][0] == sign: return True
+    elif grid[0][1] == sign and grid[1][1] == sign and grid[2][1] == sign: return True
+    elif grid[0][2] == sign and grid[1][2] == sign and grid[2][2] == sign: return True
+    elif grid[0][2] == sign and grid[1][1] == sign and grid[2][0] == sign: return True
+    elif grid[0][0] == sign and grid[1][1] == sign and grid[2][2] == sign: return True
+
     return False
 
-def isTaken(move, board):
-    row = (move - 1) // 3
-    col = (move - 1) % 3
-    if board[row][col] == userMark or board[row][col] == pcMark:
+def isTaken(move):
+    global grid
+    if grid[(move - 1) // 3][(move - 1) % 3] == userMark or grid[(move - 1) // 3][(move - 1) % 3] == pcMark:
         return True
     return False
 # # ----------------------------------------
-userMark = 'O'
-pcMark = 'X'
-grid = [[], [], []]
-
-sc = 1 #variable para el icono
 for row in grid:
     for square in range(3):
-        row.append('-')
-        if sc != 9:
-            sc += 1
+        row.append(' ')
 
-freeCelds = sc
-while freeCelds != 0:
-    if isWinner(grid, userMark):
-        displayBoard(grid)
-        print('Jugador gana')
-        break
-    elif isWinner(grid, pcMark):
-        displayBoard(grid)
-        print('Pc gana')
-        break
+while run:
+    userTurn()
+    if isWinner(userMark): run = False
     else:
-        displayBoard(grid)
-        userTurn(grid)
-        time.sleep(2)
-        pcTurn(grid)
-        freeCelds -= 1
-else:
-    displayBoard(grid)
-    print('esto es un empate')
+        sleep(1.5)
+        pcTurn()
+        if isWinner(pcMark): run = False
+    displayBoard()
+
+print('\n   FIN DEL JUEGO')
