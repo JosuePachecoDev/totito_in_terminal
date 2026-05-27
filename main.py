@@ -21,10 +21,15 @@ def displayBoard():
 def userTurn():
     global grid, run, freeCelds
     while True:
-        userMove = int(input('\n-- Ingresa tu próxima jugada: '))
+        try:
+            userMove = int(input('\n-- Ingresa tu próxima jugada: '))
+        except ValueError:
+            print(f'Entrada invalida: Ingresa un valor entero de 1-9')
+            continue
+
         if userMove > 0 and userMove <= 9:
             if isTaken(userMove):
-                print(f'La casilla {userMove} ya está marcada, prueba otra vez ↡')
+                print(f'La casilla {userMove} ya está marcada, prueba otra vez')
                 continue
             else:
                 userMove -= 1
@@ -32,7 +37,7 @@ def userTurn():
                 freeCelds -= 1
                 break
         else:
-            print(userMove, 'está fuera de rango, prueba otra vez ↡')
+            print(userMove, 'está fuera de rango, prueba otra vez')
             continue
 
 def pcTurn():
